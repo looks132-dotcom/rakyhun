@@ -26,6 +26,22 @@ const { LanPeer } = require("../lib/lan-peer");
   try {
     const page = await app.firstWindow();
     page.on("pageerror", (e) => errors.push(e.message));
+    for (
+      let i = 0;
+      i < 60 && !app.windows().some((w) => w.url().includes("/pet.html"));
+      i++
+    )
+      await new Promise((r) => setTimeout(r, 50));
+    assert.ok(
+      app.windows().some((w) => w.url().includes("/pet.html")),
+      "own desktop pet appears before login or group setup",
+    );
+    let visiblePet=false;
+    for(let i=0;i<60&&!visiblePet;i++){
+      visiblePet=await app.evaluate(({BrowserWindow,screen})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().endsWith('/pet.html')).some(w=>{const b=w.getBounds(),a=screen.getDisplayMatching(b).workArea;return w.isVisible()&&b.x>=a.x&&b.y>=a.y&&b.x+b.width<=a.x+a.width&&b.y+b.height<=a.y+a.height}));
+      if(!visiblePet)await new Promise(r=>setTimeout(r,50));
+    }
+    assert.ok(visiblePet,'desktop pet is actually visible within the current monitor before setup');
     await page.locator("[data-view=settings]").click();
     await page.locator("#web-login").waitFor();
     await app.evaluate(({ shell }) => {
@@ -52,7 +68,9 @@ const { LanPeer } = require("../lib/lan-peer");
       });
       await w.loadURL(url);
     }, url);
-    const browser = app.windows().find((w) => w !== page);
+    const browser = app
+      .windows()
+      .find((w) => w.url().startsWith("http://127.0.0.1:"));
     await browser.locator("[name=name]").fill("수아");
     await browser.locator("[name=username]").fill("localtest");
     await browser.locator("[name=password]").fill("local-password-2026");
@@ -209,6 +227,54 @@ const { LanPeer } = require("../lib/lan-peer");
       .locator("#upload")
       .setInputFiles(path.resolve("desktop/icon.png"));
     await page.locator("#scene .custom-creature").waitFor();
+    await messenger.locator("#new-room").click();
+    await messenger.locator("#new-room-name").fill("기획팀");
+    await messenger.screenshot({
+      path: path.join(out, "messenger-create-room.png"),
+    });
+    await messenger
+      .locator("#room-form button[type=submit], #room-form button.primary")
+      .click();
+    await messenger
+      .locator("#room-title")
+      .filter({ hasText: "기획팀" })
+      .waitFor();
+    let ownPet;
+    for (const p of app.windows().filter((w) => w.url().includes("/pet.html")))
+      if ((await p.locator("#pet-name").textContent()).includes("수아"))
+        ownPet = p;
+    assert.ok(ownPet);
+    const inputWindow = app.waitForEvent("window");
+    await page.evaluate(() => window.moongle.compose());
+    const composer = await inputWindow;
+    composer.on("pageerror", (e) => errors.push(e.message));
+    await composer.locator("#mini-input").waitFor();
+    const composerHandle = await app.browserWindow(composer),
+      ownHandle = await app.browserWindow(ownPet);
+    const cb = await composerHandle.evaluate((w) => w.getBounds()),
+      pb = await ownHandle.evaluate((w) => w.getBounds());
+    assert.ok(cb.width <= 250 && cb.height <= 48);
+    assert.ok(Math.abs(cb.x + cb.width / 2 - (pb.x + pb.width / 2)) <= 40,'input remains above the character, clamped at a screen edge');
+    assert.ok(
+      cb.y + cb.height < pb.y + 95,
+      "input sits above own character name/head",
+    );
+    assert.equal(await composer.locator("input").count(), 1);
+    assert.equal(await composer.locator("button").count(), 0);
+    await composer
+      .locator("#mini-input")
+      .fill("머리 위 작은 입력창에서 보낸 대화");
+    await composer.screenshot({
+      path: path.join(out, "compact-desktop-input.png"),
+    });
+    await composer.locator("#mini-input").press("Enter");
+    await messenger
+      .locator("#history")
+      .getByText("머리 위 작은 입력창에서 보낸 대화")
+      .waitFor();
+    await messenger.screenshot({
+      path: path.join(out, "messenger-new-room.png"),
+    });
     await page.locator("[data-view=office]").click();
     await page.screenshot({ path: path.join(out, "lan-office.png") });
     assert.ok(before.length >= 2);

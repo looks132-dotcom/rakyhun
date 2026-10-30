@@ -32,7 +32,9 @@ let mainWindow,
   pendingLogin = 0,
   publishTimer,
   hoverTimer,
-  walkTimer;
+  walkTimer,
+  activeRoomId = "",
+  composerWanted = false;
 const settingsFile = () => path.join(app.getPath("userData"), "settings.json");
 function save() {
   fs.writeFileSync(settingsFile(), JSON.stringify(settings), { mode: 0o600 });
@@ -90,10 +92,10 @@ function makeMini() {
   if (miniWindow && !miniWindow.isDestroyed()) return miniWindow;
   const b = screen.getPrimaryDisplay().workArea;
   miniWindow = new BrowserWindow({
-    width: 510,
-    height: 180,
-    x: b.x + b.width - 530,
-    y: b.y + b.height - 200,
+    width: 248,
+    height: 44,
+    x: b.x + b.width - 268,
+    y: b.y + b.height - 260,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -104,9 +106,55 @@ function makeMini() {
   });
   secure(miniWindow);
   miniWindow.loadFile(path.join(__dirname, "mini.html"));
-  miniWindow.webContents.on("did-finish-load", publish);
+  miniWindow.webContents.on("did-finish-load", () => {
+    publish();
+    if (composerWanted) revealComposer();
+  });
+  miniWindow.on("blur", () => {
+    composerWanted = false;
+    miniWindow?.hide();
+  });
   miniWindow.on("closed", () => (miniWindow = null));
   return miniWindow;
+}
+function revealComposer() {
+  if (!miniWindow || miniWindow.isDestroyed()) return;
+  const own = petWindows.get(lan.id)?.win;
+  const bounds = own?.getBounds() || {
+    ...screen.getPrimaryDisplay().workArea,
+    width: 170,
+    height: 240,
+  };
+  const area = screen.getDisplayMatching(bounds).workArea;
+  miniWindow.setBounds({
+    x: Math.round(
+      Math.max(
+        area.x,
+        Math.min(area.x + area.width - 248, bounds.x + 85 - 124),
+      ),
+    ),
+    y: Math.max(area.y, bounds.y + 48),
+    width: 248,
+    height: 44,
+  });
+  miniWindow.webContents.send("snapshot", stateFor(activeRoomId));
+  miniWindow.show();
+  miniWindow.focus();
+  miniWindow.webContents.send("compose");
+}
+function openComposer() {
+  if (!token || !lan.group()) {
+    showMain();
+    mainWindow.webContents.send("show-settings");
+    return { needsSetup: true };
+  }
+  settings.desktopPets = true;
+  save();
+  publish();
+  composerWanted = true;
+  const w = makeMini();
+  if (!w.webContents.isLoading()) revealComposer();
+  return { ok: true };
 }
 function showMessenger() {
   if (!messengerWindow || messengerWindow.isDestroyed()) {
@@ -154,11 +202,11 @@ function publish() {
   for (const w of [mainWindow, miniWindow, messengerWindow])
     if (w && !w.isDestroyed()) w.webContents.send("lan-state", state);
   if (miniWindow && !miniWindow.isDestroyed())
-    miniWindow.webContents.send("snapshot", state);
+    miniWindow.webContents.send("snapshot", stateFor(activeRoomId));
   updatePets(state);
 }
 function updatePets(state) {
-  const enabled = settings.desktopPets !== false && !!lan.group();
+  const enabled = settings.desktopPets !== false;
   const people = enabled ? state.people.slice(0, 16) : [];
   const keep = new Set(people.map((p) => p.id));
   for (const [id, record] of petWindows)
@@ -186,6 +234,12 @@ function updatePets(state) {
         focusable: true,
         webPreferences: webPreferences(),
       });
+      const restored = win.getBounds(),
+        area = screen.getDisplayMatching(restored).workArea;
+      win.setPosition(
+        Math.max(area.x, Math.min(area.x + area.width - 170, restored.x)),
+        Math.max(area.y, Math.min(area.y + area.height - 240, restored.y)),
+      );
       secure(win);
       record = { win, person, id: person.id, drag: null, hasSpeech: false };
       petWindows.set(person.id, record);
@@ -241,7 +295,12 @@ function attachPetInput() {
     if (settings.roaming === false) return;
     const mouse = screen.getCursorScreenPoint();
     for (const r of petWindows.values()) {
-      if (r.drag || r.person.status !== "online" || r.win.isDestroyed())
+      if (
+        r.drag ||
+        r.person.status !== "online" ||
+        r.win.isDestroyed() ||
+        (r.id === lan.id && miniWindow?.isVisible())
+      )
         continue;
       const b = r.win.getBounds();
       if (Math.abs(mouse.x - b.x) < 200 && Math.abs(mouse.y - b.y) < 220)
@@ -374,30 +433,44 @@ function registerIpc() {
     publish();
     return { ok: true };
   });
-  handle("compose", () => {
-    const w = makeMini();
-    w.show();
-    w.focus();
-    w.webContents.send("compose");
-    publish();
+  handle("compose", () => openComposer());
+  handle("hide-mini", () => {
+    composerWanted = false;
+    miniWindow?.hide();
   });
-  handle("hide-mini", () => miniWindow?.hide());
   handle("show-main", () => showMain());
+  handle("show-setup", () => {
+    showMain();
+    mainWindow.webContents.send("show-settings");
+  });
   handle("messenger", () => {
     showMessenger();
     return { ok: true };
   });
   handle("messenger-state", async (_event, roomId) => {
     await authApi("/api/me");
-    return stateFor(roomId);
+    const result = stateFor(roomId);
+    activeRoomId = result.roomId;
+    return result;
   });
   handle("snapshot", () => ({ ok: true }));
   handle("mini-chat", async (_event, text) => {
     await authApi("/api/me");
-    const first = lan.group()?.rooms[0];
-    if (typeof text === "string" && text.trim() && text.length <= 300 && first)
-      lan.send({ roomId: first.id, text });
+    const selected =
+      lan.group()?.rooms.find((r) => r.id === activeRoomId) ||
+      lan.group()?.rooms[0];
+    if (
+      typeof text !== "string" ||
+      !text.trim() ||
+      text.length > 300 ||
+      !selected
+    )
+      throw Error("대화방을 먼저 만들어 주세요.");
+    const result = lan.send({ roomId: selected.id, text });
     publish();
+    composerWanted = false;
+    miniWindow?.hide();
+    return result;
   });
   handle("notify", (_event, { title, body }) => {
     if (lan.status === "focus" || lan.status === "offline") return;
@@ -551,13 +624,9 @@ else {
         ]),
       );
       tray.on("click", showMessenger);
-      globalShortcut.register("CommandOrControl+Shift+Space", () => {
-        const w = makeMini();
-        w.show();
-        w.focus();
-        w.webContents.send("compose");
-        publish();
-      });
+      globalShortcut.register("CommandOrControl+Shift+Space", () =>
+        openComposer(),
+      );
       const powerState = {
         locked: false,
         suspended: false,

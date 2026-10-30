@@ -21,6 +21,9 @@
     <div class="messenger-layout">
       <aside class="messenger-sidebar">
         <h2>대화방</h2>
+        <button id="new-room" class="create-room-button">
+          ＋ 대화방 만들기
+        </button>
         <div id="room-list"></div>
         <h2>동료 <span id="peer-count"></span></h2>
         <div id="contact-list"></div>
@@ -31,6 +34,13 @@
           ><span>기록은 이 PC에 보관돼요</span>
         </div>
         <div id="history" aria-live="polite"></div>
+        <div id="setup-help" class="hidden">
+          <p>
+            아직 모임이 없어요. 모임을 만들거나 동료의 초대 코드로 참여해
+            주세요.
+          </p>
+          <button id="open-setup" class="primary">모임 만들기 / 참여</button>
+        </div>
         <form id="messenger-form">
           <input
             id="message-input"
@@ -44,6 +54,23 @@
         </div>
       </main>
     </div>
+    <dialog id="room-dialog">
+      <form id="room-form">
+        <h2>새 대화방 만들기</h2>
+        <label for="new-room-name">방 이름</label
+        ><input
+          id="new-room-name"
+          maxlength="24"
+          placeholder="예: 디자인팀"
+          required
+        />
+        <p id="room-error" role="alert"></p>
+        <div>
+          <button type="button" id="cancel-room" class="secondary">취소</button
+          ><button class="primary">만들기</button>
+        </div>
+      </form>
+    </dialog>
     <script src="messenger.js"></script>
   </body>
 </html>

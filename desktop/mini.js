@@ -1,66 +1,42 @@
-const $ = (s) => document.querySelector(s);
-let snapshot;
+const input = document.querySelector("#mini-input");
+let snapshot,
+  busy = false;
 window.moongle.onSnapshot((data) => {
   snapshot = data;
-  $("#mini-room").textContent = data.roomName || "";
-  $("#mini-people").replaceChildren(
-    ...data.people.slice(0, 8).map((p) => {
-      const wrap = document.createElement("div");
-      wrap.className =
-        "mini-person " + (p.status === "offline" ? "offline" : "");
-      let c;
-      if (p.character === "custom" && p.image) {
-        c = document.createElement("img");
-        c.src = p.image;
-        c.alt = p.petName;
-      } else {
-        c = document.createElement("div");
-        c.className =
-          "creature " + ({ bunny: "bunny", bean: "bean" }[p.character] || "");
-        c.innerHTML =
-          '<span class="ears"></span><span class="eyes"><i></i><i></i></span><span class="blush"></span><span class="mouth"></span>';
-      }
-      const n = document.createElement("div");
-      n.className = "mini-name";
-      n.textContent = p.name + (p.id === data.userId ? " · 나" : "");
-      wrap.append(c, n);
-      const m =
-        p.status !== "offline" &&
-        data.status !== "offline" &&
-        data.messages
-          .filter((m) => m.userId === p.id && Date.now() - m.createdAt < 7000)
-          .at(-1);
-      if (m) {
-        const b = document.createElement("div");
-        b.className = "mini-bubble";
-        b.textContent = m.text;
-        wrap.append(b);
-      }
-      return wrap;
-    }),
-  );
-  $("#mini-status").textContent = data.connected
-    ? data.status === "focus"
-      ? "집중 중 · 알림을 쉬고 있어요"
-      : "캐릭터들과 연결되어 있어요 · 상단을 잡아 이동"
-    : "기기 로그인 후 같은 사내 모임에 참여해 주세요.";
+  if (busy) return;
+  input.disabled = data.status === "offline" || !data.connected;
+  input.placeholder = !data.connected
+    ? "로그인 후 모임에 참여해 주세요"
+    : data.status === "offline"
+      ? "퇴근 상태예요 · 접속 후 입력해 주세요"
+      : (data.roomName || "전체 대화") + "에 입력 · Enter 전송";
 });
-$("#mini-form").onsubmit = async (e) => {
-  e.preventDefault();
-  const text = $("#mini-input").value.trim();
-  if (!snapshot?.connected) {
-    $("#mini-status").textContent = "먼저 오피스에서 로그인하고 연결해 주세요.";
+window.moongle.onCompose(() => {
+  input.focus();
+});
+document.querySelector("#mini-form").onsubmit = async (event) => {
+  event.preventDefault();
+  const value = input.value.trim();
+  if (!value || busy || !snapshot?.connected || snapshot.status === "offline")
     return;
-  }
-  if (snapshot.status === "offline") {
-    $("#mini-status").textContent = "근무 중 상태로 변경해 주세요.";
-    return;
-  }
-  if (text) {
-    await window.moongle.sendChat(text);
-    $("#mini-input").value = "";
+  busy = true;
+  input.disabled = true;
+  try {
+    await window.moongle.sendChat(value);
+    input.value = "";
+  } catch (error) {
+    input.disabled = false;
+    input.placeholder =
+      error.message || "전송하지 못했어요. 다시 입력해 주세요.";
+    input.focus();
+  } finally {
+    busy = false;
+    input.disabled = snapshot?.status === "offline" || !snapshot?.connected;
   }
 };
-$("#expand").onclick = () => window.moongle.showMain();
-$("#hide").onclick = () => window.moongle.hideMini();
-window.moongle.onCompose(() => $("#mini-input").focus());
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    window.moongle.hideMini();
+  }
+});

@@ -1208,6 +1208,7 @@ async function init() {
     renderMessages();
     renderInbox();
   } else if (desktop) {
+    desktop.onShowSettings(() => view("settings"));
     desktop.onLanState(async (data) => {
       info = await desktop.info();
       if (authenticated) {

@@ -20,6 +20,8 @@ async function refresh() {
   try {
     state = await window.moongle.messengerState(roomId);
     roomId = state.roomId;
+    $("#setup-help").classList.toggle("hidden", state.rooms.length > 0);
+    $("#new-room").disabled = !state.rooms.length;
     $("#connection").textContent =
       state.status === "offline"
         ? "퇴근 상태 · 기존 기록을 확인할 수 있어요"
@@ -119,6 +121,8 @@ async function refresh() {
         seq: Math.max(...state.messages.map((m) => m.seq)),
       });
   } catch (e) {
+    $("#setup-help").classList.remove("hidden");
+    $("#new-room").disabled = true;
     $("#send-status").textContent =
       e.message || "오피스에서 로그인하고 모임에 참여해 주세요.";
   } finally {
@@ -148,6 +152,31 @@ $("#messenger-form").onsubmit = async (e) => {
   }
 };
 $("#open-office").onclick = () => window.moongle.showMain();
+$("#open-setup").onclick = () => window.moongle.showSetup();
+$("#new-room").onclick = () => {
+  $("#room-error").textContent = "";
+  $("#new-room-name").value = "";
+  $("#room-dialog").showModal();
+  $("#new-room-name").focus();
+};
+$("#cancel-room").onclick = () => $("#room-dialog").close();
+$("#room-form").onsubmit = async (event) => {
+  event.preventDefault();
+  const name = $("#new-room-name").value.trim();
+  if (!name) return;
+  try {
+    const result = await api("/api/rooms", {
+      name,
+      workspaceId: state.workspaces[0].id,
+    });
+    roomId = result.room.id;
+    signature = "";
+    $("#room-dialog").close();
+    await refresh();
+  } catch (error) {
+    $("#room-error").textContent = error.message;
+  }
+};
 window.moongle.onLanState(() => refresh());
 window.addEventListener("focus", () => refresh());
 setInterval(refresh, 2500);

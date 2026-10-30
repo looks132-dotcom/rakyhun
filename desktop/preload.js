@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld("moongle", {
   mini: () => ipcRenderer.invoke("mini"),
   hideMini: () => ipcRenderer.invoke("hide-mini"),
   showMain: () => ipcRenderer.invoke("show-main"),
+  showSetup: () => ipcRenderer.invoke("show-setup"),
+  onShowSettings: (fn) => on("show-settings", fn),
   snapshot: (data) => ipcRenderer.invoke("snapshot", data),
   sendChat: (text) => ipcRenderer.invoke("mini-chat", text),
   notify: (data) => ipcRenderer.invoke("notify", data),

@@ -74,6 +74,12 @@ function end() {
 h.onpointerup = end;
 h.onpointercancel = end;
 h.ondblclick = () => window.moongle.openPet();
+h.oncontextmenu = (event) => {
+  event.preventDefault();
+  window.moongle.compose();
+};
+h.title =
+  "드래그로 이동 · 더블클릭으로 메신저 · 우클릭 또는 Ctrl+Shift+Space로 대화";
 h.onkeydown = (e) => {
   if (e.key === "Enter") window.moongle.openPet();
 };

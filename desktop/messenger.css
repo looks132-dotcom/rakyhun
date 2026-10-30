@@ -5,6 +5,51 @@
   margin: 0;
   overflow: hidden;
 }
+.create-room-button {
+  background: #fff;
+  border: 1px solid #dce5cf;
+  color: #6e875e;
+  margin-bottom: 12px;
+}
+.messenger-sidebar .create-room-button {
+  font-size: 11px;
+}
+#setup-help {
+  margin: 20px;
+  padding: 20px;
+  border: 1px dashed #c3d1b3;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #82936f;
+}
+#room-dialog h2 {
+  font-size: 18px;
+  margin-top: 0;
+}
+#room-dialog label {
+  display: block;
+  font-size: 12px;
+  margin: 15px 0 8px;
+}
+#new-room-name {
+  width: 100%;
+  border: 1px solid #d8e2cb;
+  border-radius: 7px;
+  padding: 11px;
+  font: inherit;
+  font-size: 12px;
+}
+#room-dialog form > div {
+  display: flex;
+  justify-content: end;
+  gap: 8px;
+}
+#room-error {
+  font-size: 11px;
+  color: #b37e6a;
+  min-height: 18px;
+}
 .messenger-header {
   margin: 0;
   padding: 20px 24px;
