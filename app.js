@@ -741,6 +741,13 @@ function renderSettings() {
   $("#invite-code").textContent = preview
     ? "미리보기 · 실제 초대 코드가 아닙니다"
     : workspaces[0]?.invite || "로그인하고 모임을 만들거나 참여해 주세요.";
+  const capacity = workspaces[0];
+  $("#capacity-summary").textContent = capacity
+    ? `등록 ${capacity.memberCount || people.length}명 / 최대 ${capacity.maxMembers || 10}명 · 나와 퇴근한 동료 포함`
+    : "기본 최대 10명 · 모임 참여 후 조절할 수 있어요.";
+  if (document.activeElement !== $("#member-limit"))
+    $("#member-limit").value = capacity?.maxMembers || 10;
+  $("#capacity-form button").disabled = !desktop || !authenticated || !capacity;
   $("#server-current").textContent = preview
     ? "사내 연결은 설치 앱에서 사용할 수 있어요."
     : info.configured
@@ -1018,16 +1025,21 @@ function setupUI() {
   $("#copy-invite").onclick = safeAction(async () => {
     const code = workspaces[0]?.invite;
     if (preview || !code) throw Error("로그인 후 모임을 먼저 만들어 주세요.");
-    const invitation =
-      "뭉글 사내 모임 초대\n" +
-      code +
-      "\n같은 사내 네트워크에서 앱의 사내 연결과 초대에 코드를 입력하세요.";
+    const invitation = code;
     try {
-      await navigator.clipboard.writeText(invitation);
+      if (desktop) await desktop.copyInvite();
+      else await navigator.clipboard.writeText(invitation);
       toast("모임 초대 코드를 복사했어요.");
     } catch {
       modal("초대 정보", [el("pre", "invite-text", invitation)]);
     }
+  });
+  $("#capacity-form").onsubmit = safeAction(async (event) => {
+    event.preventDefault();
+    if (!desktop) throw Error("설치 앱에서 설정해 주세요.");
+    await desktop.setMemberLimit(Number($("#member-limit").value));
+    await sync();
+    toast("모임 최대 인원을 저장했어요. 연결된 동료들에게도 반영됩니다.");
   });
   $("#pets-visible").onchange = safeAction(async (e) => {
     if (desktop) await desktop.petOptions({ visible: e.target.checked });

@@ -10,6 +10,8 @@ contextBridge.exposeInMainWorld("moongle", {
   login: () => ipcRenderer.invoke("login"),
   logout: () => ipcRenderer.invoke("logout"),
   joinLan: (options) => ipcRenderer.invoke("lan-join", options),
+  setMemberLimit: (value) => ipcRenderer.invoke("lan-limit", value),
+  copyInvite: () => ipcRenderer.invoke("copy-invite"),
   connectPeer: (address) => ipcRenderer.invoke("lan-connect", address),
   petOptions: (options) => ipcRenderer.invoke("pet-options", options),
   petDrag: (data) => ipcRenderer.invoke("pet-drag", data),

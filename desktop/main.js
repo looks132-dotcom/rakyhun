@@ -11,12 +11,14 @@ const {
   Menu,
   nativeImage,
   screen,
+  clipboard,
 } = require("electron");
 const fs = require("node:fs"),
   path = require("node:path"),
   crypto = require("node:crypto");
 const { createService } = require("../lib/service"),
   { LanPeer } = require("../lib/lan-peer");
+const { setLimit } = require("../lib/lan-membership");
 const root = path.join(__dirname, ".."),
   petWindows = new Map();
 let mainWindow,
@@ -207,7 +209,12 @@ function publish() {
 }
 function updatePets(state) {
   const enabled = settings.desktopPets !== false;
-  const people = enabled ? state.people.slice(0, 16) : [];
+  const people = enabled
+    ? state.people.slice(
+        0,
+        Math.max(10, Math.min(30, lan.group()?.maxMembers || 10)),
+      )
+    : [];
   const keep = new Set(people.map((p) => p.id));
   for (const [id, record] of petWindows)
     if (!keep.has(id)) {
@@ -406,6 +413,19 @@ function registerIpc() {
     const result = create ? lan.createGroup(name) : lan.join(code);
     publish();
     return result;
+  });
+  handle("lan-limit", async (_event, value) => {
+    await authApi("/api/me");
+    const result = setLimit(lan, value);
+    publish();
+    return result;
+  });
+  handle("copy-invite", async () => {
+    await authApi("/api/me");
+    const code = lan.invite();
+    if (!code) throw Error("모임에 먼저 참여해 주세요.");
+    clipboard.writeText(code);
+    return { ok: true };
   });
   handle("lan-connect", async (_event, value) => {
     await authApi("/api/me");

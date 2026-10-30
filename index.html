@@ -235,7 +235,7 @@
               <input
                 id="lan-code"
                 maxlength="1024"
-                placeholder="동료에게 받은 MOONGLE1. 코드"
+                placeholder="동료에게 받은 초대 코드 붙여넣기"
                 aria-label="모임 초대 코드"
                 required
               /><button class="secondary">이 모임 참여</button>
@@ -264,14 +264,26 @@
             </button>
           </section>
           <section class="setup-card">
-            <h2>우리 모임 초대 코드</h2>
+            <h2>모임 인원과 초대 코드</h2>
+            <p id="capacity-summary">기본 최대 10명 · 나와 퇴근한 동료 포함</p>
+            <form id="capacity-form">
+              <label for="member-limit">최대 인원</label
+              ><input
+                id="member-limit"
+                type="number"
+                min="2"
+                max="30"
+                value="10"
+                required
+              /><button class="secondary">인원 설정 저장</button>
+            </form>
             <p>
               이 코드를 아는 동료끼리 같은 사내 네트워크에서 연결해요. 처음 만난
               동료는 서로 앱을 켰을 때 목록에 추가돼요.
             </p>
             <code id="invite-code">로그인하고 모임에 참여해 주세요.</code>
             <div class="invite-buttons">
-              <button class="secondary" id="copy-invite">초대 정보 복사</button>
+              <button class="secondary" id="copy-invite">코드만 복사</button>
             </div>
             <p id="server-current"></p>
             <div id="lan-addresses"></div>

@@ -36,12 +36,29 @@ const { LanPeer } = require("../lib/lan-peer");
       app.windows().some((w) => w.url().includes("/pet.html")),
       "own desktop pet appears before login or group setup",
     );
-    let visiblePet=false;
-    for(let i=0;i<60&&!visiblePet;i++){
-      visiblePet=await app.evaluate(({BrowserWindow,screen})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().endsWith('/pet.html')).some(w=>{const b=w.getBounds(),a=screen.getDisplayMatching(b).workArea;return w.isVisible()&&b.x>=a.x&&b.y>=a.y&&b.x+b.width<=a.x+a.width&&b.y+b.height<=a.y+a.height}));
-      if(!visiblePet)await new Promise(r=>setTimeout(r,50));
+    let visiblePet = false;
+    for (let i = 0; i < 60 && !visiblePet; i++) {
+      visiblePet = await app.evaluate(({ BrowserWindow, screen }) =>
+        BrowserWindow.getAllWindows()
+          .filter((w) => w.webContents.getURL().endsWith("/pet.html"))
+          .some((w) => {
+            const b = w.getBounds(),
+              a = screen.getDisplayMatching(b).workArea;
+            return (
+              w.isVisible() &&
+              b.x >= a.x &&
+              b.y >= a.y &&
+              b.x + b.width <= a.x + a.width &&
+              b.y + b.height <= a.y + a.height
+            );
+          }),
+      );
+      if (!visiblePet) await new Promise((r) => setTimeout(r, 50));
     }
-    assert.ok(visiblePet,'desktop pet is actually visible within the current monitor before setup');
+    assert.ok(
+      visiblePet,
+      "desktop pet is actually visible within the current monitor before setup",
+    );
     await page.locator("[data-view=settings]").click();
     await page.locator("#web-login").waitFor();
     await app.evaluate(({ shell }) => {
@@ -85,7 +102,36 @@ const { LanPeer } = require("../lib/lan-peer");
     await page.locator("#scene .pet").waitFor();
     await page.locator("[data-view=settings]").click();
     const code = await page.locator("#invite-code").textContent();
-    assert.ok(code.startsWith("MOONGLE1."));
+    assert.match(code, /^[A-Za-z0-9_-]{43}$/);
+    await page
+      .locator("#capacity-summary")
+      .filter({ hasText: "최대 10명" })
+      .waitFor();
+    const previousClipboard = await app.evaluate(({ clipboard }) =>
+      clipboard.readText(),
+    );
+    try {
+      await page.locator("#copy-invite").click();
+      let copied=false;for(let i=0;i<50&&!copied;i++){copied=await app.evaluate(({clipboard},code)=>clipboard.readText()===code,code);if(!copied)await new Promise(r=>setTimeout(r,20))}
+      assert.ok(copied,'clipboard contains exactly the invitation code, without surrounding text');
+    } finally {
+      await app.evaluate(
+        ({ clipboard }, value) => clipboard.writeText(value),
+        previousClipboard,
+      );
+    }
+    await page.locator("#member-limit").fill("12");
+    await page.locator("#capacity-form button").click();
+    await page
+      .locator("#capacity-summary")
+      .filter({ hasText: "최대 12명" })
+      .waitFor();
+    await page.locator("#member-limit").fill("10");
+    await page.locator("#capacity-form button").click();
+    await page
+      .locator("#capacity-summary")
+      .filter({ hasText: "최대 10명" })
+      .waitFor();
     peer.join(code);
     peer.updateProfile({
       ...peer.profile,
@@ -254,7 +300,10 @@ const { LanPeer } = require("../lib/lan-peer");
     const cb = await composerHandle.evaluate((w) => w.getBounds()),
       pb = await ownHandle.evaluate((w) => w.getBounds());
     assert.ok(cb.width <= 250 && cb.height <= 48);
-    assert.ok(Math.abs(cb.x + cb.width / 2 - (pb.x + pb.width / 2)) <= 40,'input remains above the character, clamped at a screen edge');
+    assert.ok(
+      Math.abs(cb.x + cb.width / 2 - (pb.x + pb.width / 2)) <= 40,
+      "input remains above the character, clamped at a screen edge",
+    );
     assert.ok(
       cb.y + cb.height < pb.y + 95,
       "input sits above own character name/head",

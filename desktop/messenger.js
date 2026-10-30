@@ -42,7 +42,8 @@ async function refresh() {
         return b;
       }),
     );
-    $("#peer-count").textContent = state.people.length;
+    $("#peer-count").textContent =
+      state.people.length + " / " + (state.workspaces[0]?.maxMembers || 10);
     $("#contact-list").replaceChildren(
       ...state.people.map((p) => {
         const c = el(
