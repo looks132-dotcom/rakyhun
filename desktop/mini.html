@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:"
+    />
+    <title>뭉글 미니 모드</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="mini.css" />
+  </head>
+  <body class="mini-body">
+    <div class="mini-panel">
+      <div class="mini-toolbar">
+        <span>✳ 뭉글 <span id="mini-room"></span></span>
+        <div>
+          <button id="expand" aria-label="오피스 열기">↗</button
+          ><button id="hide" aria-label="미니 모드 숨기기">−</button>
+        </div>
+      </div>
+      <div id="mini-people"></div>
+      <form id="mini-form">
+        <input
+          id="mini-input"
+          aria-label="미니 채팅"
+          maxlength="300"
+          placeholder="Ctrl+Shift+Space로 대화하기"
+        /><button aria-label="보내기">↑</button>
+      </form>
+      <div id="mini-status" role="status">
+        오피스에서 로그인하면 동료들이 나타나요.
+      </div>
+    </div>
+    <script src="mini.js"></script>
+  </body>
+</html>

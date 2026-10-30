@@ -1,0 +1,8 @@
+const fs=require('node:fs'),zlib=require('node:zlib'),path=require('node:path');
+const size=256,pixels=Buffer.alloc((size*4+1)*size);
+for(let y=0;y<size;y++){pixels[y*(size*4+1)]=0;for(let x=0;x<size;x++){let color=[0,0,0,0];const rounded=(Math.max(32-x,0,x-223)**2+Math.max(32-y,0,y-223)**2)<32**2;if(rounded)color=[111,139,95,255];if(((x-128)/72)**2+((y-131)/65)**2<1)color=[244,211,128,255];if(((x-92)/17)**2+((y-188)/18)**2<1||((x-163)/17)**2+((y-188)/18)**2<1)color=[244,211,128,255];if(((x-104)/5)**2+((y-130)/8)**2<1||((x-151)/5)**2+((y-130)/8)**2<1)color=[62,75,53,255];if(((x-85)/11)**2+((y-147)/6)**2<1||((x-172)/11)**2+((y-147)/6)**2<1)color=[232,166,130,255];if(y>145&&y<154&&Math.abs(Math.hypot(x-128,(y-145)*1.3)-9)<1.5)color=[105,101,65,255];pixels.set(color,y*(size*4+1)+1+x*4)}}
+const crc=b=>{let c=0xffffffff;for(const v of b){c^=v;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0)}return (c^0xffffffff)>>>0};
+function chunk(type,data){const t=Buffer.from(type),b=Buffer.alloc(data.length+12);b.writeUInt32BE(data.length);t.copy(b,4);data.copy(b,8);b.writeUInt32BE(crc(Buffer.concat([t,data])),data.length+8);return b}
+const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(size);ihdr.writeUInt32BE(size,4);ihdr[8]=8;ihdr[9]=6;
+const png=Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',ihdr),chunk('IDAT',zlib.deflateSync(pixels)),chunk('IEND',Buffer.alloc(0))]);
+fs.writeFileSync(path.join(__dirname,'../desktop/icon.png'),png);const ico=Buffer.alloc(22);ico.writeUInt16LE(1,2);ico.writeUInt16LE(1,4);ico[6]=0;ico[7]=0;ico.writeUInt16LE(1,10);ico.writeUInt16LE(32,12);ico.writeUInt32LE(png.length,14);ico.writeUInt32LE(22,18);fs.writeFileSync(path.join(__dirname,'../desktop/icon.ico'),Buffer.concat([ico,png]));

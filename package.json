@@ -1,0 +1,56 @@
+{
+  "name": "moongle-office",
+  "version": "0.3.0",
+  "description": "Private character chat for small teams",
+  "author": "Moongle",
+  "private": true,
+  "main": "desktop/main.js",
+  "scripts": {
+    "start": "node server.js",
+    "desktop": "electron .",
+    "dist": "electron-builder --win nsis --x64",
+    "test": "node --test test/*.test.js",
+    "check": "node --check app.js && node --check server.js && node --check desktop/main.js"
+  },
+  "devDependencies": {
+    "electron": "^43.0.0",
+    "electron-builder": "^26.0.0",
+    "playwright-core": "^1.56.0"
+  },
+  "build": {
+    "appId": "kr.moongle.office",
+    "productName": "Moongle",
+    "artifactName": "Moongle-Setup-${version}.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "desktop/**",
+      "lib/**",
+      "index.html",
+      "style.css",
+      "app.js",
+      "login.html",
+      "login.js",
+      "server.js",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "desktop/icon.ico",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Moongle",
+      "installerLanguages": [
+        "ko_KR",
+        "en_US"
+      ]
+    }
+  }
+}

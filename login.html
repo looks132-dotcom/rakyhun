@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>뭉글 · 웹 로그인</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="login-body">
+    <main class="login-shell">
+      <a class="brand" href="/"
+        >✳ <span>뭉글<small>MOONGLE</small></span></a
+      >
+      <div class="eyebrow">YOUR LITTLE OFFICE, ANYWHERE</div>
+      <h1 id="login-title">반가워요, 작은 동료.</h1>
+      <p id="login-intro">웹에서 로그인하고, 설치된 앱에서 만나요.</p>
+      <div id="login-success" class="hidden success-panel">
+        <span>✓</span>
+        <h2>로그인했어요!</h2>
+        <p id="success-text">설치된 뭉글 앱으로 돌아가 주세요.</p>
+        <a class="primary" href="/app">웹 오피스 열기</a>
+      </div>
+      <form id="auth-form">
+        <div class="auth-tabs">
+          <button type="button" id="tab-login" class="selected">로그인</button
+          ><button type="button" id="tab-register">처음이에요</button>
+        </div>
+        <label class="register-only hidden"
+          >이름<input
+            name="name"
+            maxlength="20"
+            autocomplete="nickname" /></label
+        ><label
+          >아이디<input
+            name="username"
+            required
+            minlength="3"
+            maxlength="64"
+            pattern="[a-zA-Z0-9._@\-]{3,64}"
+            autocomplete="username"
+            placeholder="영문·숫자 3자 이상" /></label
+        ><label
+          >비밀번호<input
+            name="password"
+            type="password"
+            required
+            minlength="10"
+            maxlength="128"
+            autocomplete="current-password"
+            placeholder="10자 이상 입력해 주세요" /></label
+        ><label class="register-only hidden" id="invite-label"
+          >초대 코드<input
+            name="invite"
+            maxlength="128"
+            placeholder="관리자에게 받은 초대 코드 또는 초기 설정 코드" /></label
+        ><label class="checkbox"
+          ><input name="remember" type="checkbox" checked /> 이 기기에서 자동
+          로그인</label
+        >
+        <p id="auth-error" class="auth-error" role="alert"></p>
+        <button class="primary" id="auth-submit">로그인하기</button>
+        <p class="login-help" id="signup-help">
+          초대받은 직원만 함께할 수 있어요.
+        </p>
+      </form>
+      <div id="google-area" class="hidden">
+        <div class="auth-divider">또는</div>
+        <a class="secondary google-button" id="google-login" href="/auth/google"
+          >Google 계정으로 계속하기</a
+        >
+      </div>
+      <p class="login-footnote">우리끼리, 가까이. 뭉글 오피스 ✧</p>
+    </main>
+    <script src="./login.js"></script>
+  </body>
+</html>

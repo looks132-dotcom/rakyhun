@@ -1,0 +1,26 @@
+# Proposed deployment only. Applying creates a paid always-on service and disk.
+services:
+  - type: web
+    name: moongle-office
+    runtime: docker
+    region: singapore
+    plan: 0.5c-512mb
+    numInstances: 1
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    disk:
+      name: moongle-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: MOONGLE_DATA_DIR
+        value: /var/data/moongle
+      - key: TRUST_PROXY
+        value: "true"
+      - key: MOONGLE_INITIAL_INVITE
+        generateValue: true

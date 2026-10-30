@@ -1,0 +1,7 @@
+node_modules/
+.tools/
+release/
+data/
+test-output/
+.env
+*.log

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
+    />
+    <title>뭉글 — 함께 일하는 작은 친구들</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="/"
+        >✳ <span>뭉글<small>MOONGLE</small></span></a
+      >
+      <div class="workspace">
+        <span class="workspace-icon">S</span>
+        <div>스튜디오 뭉글<small>우리 팀의 작은 아지트</small></div>
+        <span>⌄</span>
+      </div>
+      <div class="nav-label">WORKSPACE</div>
+      <button class="nav active" data-view="office">
+        ◈ <span>우리의 오피스</span><b>04</b></button
+      ><button class="nav" data-view="characters">
+        ♧ <span>캐릭터 옷장</span></button
+      ><button class="nav" data-view="profile">☻ <span>내 프로필</span></button>
+      <div class="sidebar-bottom">
+        <div class="note">
+          작은 친구들과,<br />조금 더 즐거운 출근.<span>✦</span>
+        </div>
+        <div class="account">
+          <span class="account-avatar">☺</span>
+          <div id="account-name">김뭉글<small>로컬 체험 계정</small></div>
+          <button id="login-open" title="로그인 안내">⇥</button>
+        </div>
+      </div>
+    </aside>
+    <main>
+      <header>
+        <div class="breadcrumb">
+          워크스페이스 <span>/</span>
+          <strong id="page-name">우리의 오피스</strong>
+        </div>
+        <div class="header-right">
+          <span class="demo-badge" id="connection-badge">미리보기</span
+          ><button class="secondary" id="mini-open">↗ 미니 모드</button
+          ><span class="date" id="date"></span>
+        </div>
+      </header>
+      <div class="connection-banner" id="connection-banner"></div>
+      <section class="page" id="office">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">A LITTLE CLOSER, TOGETHER</div>
+            <h1>우리의 오피스<span>✳</span></h1>
+            <p>각자의 자리에서, 함께 있는 기분.</p>
+          </div>
+          <div class="heading-actions">
+            <span class="live-dot"></span
+            ><span id="online-count">3명 근무 중</span
+            ><button class="secondary" id="help">⌨ 사용 가이드</button>
+          </div>
+        </div>
+        <div class="office-card">
+          <div class="room-bar">
+            <div>
+              <span class="room-dot"></span> 라운지
+              <span class="room-divider">|</span>
+              <span class="muted">오늘도 반가워요!</span>
+            </div>
+            <span class="room-tag">팀 공간 · 체험</span>
+          </div>
+          <div class="scene" id="scene">
+            <div class="scene-caption">SOMEWHERE WE BELONG</div>
+            <div class="window"><i></i><i></i></div>
+            <div class="wall-art">make<br /><em>small</em><br />moments.</div>
+            <div class="shelf"><span>▥</span><span>▥</span><span>🪴</span></div>
+            <div class="rug"></div>
+            <div class="plant">
+              🌿
+              <div></div>
+            </div>
+            <div class="floor-line"></div>
+            <div class="scene-hint">
+              캐릭터를 잡고 움직여 보세요 <span>↗</span>
+            </div>
+          </div>
+          <div class="scene-footer">
+            <span>✧ 오늘도 우리만의 속도로</span
+            ><span
+              ><kbd>Enter</kbd> 대화하기 <i>·</i> 클릭해서 인사
+              <i>·</i> 드래그해서 이동</span
+            >
+          </div>
+        </div>
+        <div class="below">
+          <section class="chat-card">
+            <div class="section-title">
+              <h2>라운지 이야기 <span id="message-count">2</span></h2>
+              <span>이 브라우저에 저장되는 체험 대화</span>
+            </div>
+            <div id="messages" class="messages" aria-live="polite"></div>
+            <form id="chat-form">
+              <span class="input-spark">✳</span
+              ><input
+                id="chat-input"
+                maxlength="300"
+                aria-label="채팅 메시지"
+                placeholder="지금 무슨 생각을 하고 있나요?"
+                autocomplete="off"
+              /><button aria-label="메시지 보내기">↑</button>
+            </form>
+          </section>
+          <section class="status-card">
+            <div class="section-title">
+              <h2>지금 나는</h2>
+              <span>내 상태</span>
+            </div>
+            <div class="status-options">
+              <button data-status="online" class="selected">🟢 근무 중</button
+              ><button data-status="focus">🎧 집중 중</button
+              ><button data-status="away">☕ 자리 비움</button
+              ><button data-status="offline">🌙 퇴근</button>
+            </div>
+            <p>
+              웹 체험에서는 상태를 직접 변경해요.<br />PC 전원 연동은 데스크톱
+              앱에서 연결할 예정이에요.
+            </p>
+          </section>
+        </div>
+        <div class="footer-note">
+          작은 연결이 만드는 즐거운 하루.
+          <span>made for our little team ♡</span>
+        </div>
+      </section>
+      <section class="page hidden" id="characters">
+        <div class="eyebrow">MEET YOUR LITTLE SELF</div>
+        <h1>캐릭터 옷장</h1>
+        <p class="intro">나를 닮은 작은 친구를 골라보세요.</p>
+        <div id="character-grid" class="character-grid"></div>
+        <div class="upload-card">
+          <div>
+            <h2>내 이미지로 함께하기</h2>
+            <p>
+              PNG, JPG, WebP 이미지를 캐릭터로 사용해요. 투명 배경 PNG를
+              추천해요.
+            </p>
+            <small
+              >현재는 이미지에 공통 모션을 적용합니다. AI 캐릭터·모션 생성은
+              별도 연결이 필요해요.</small
+            >
+          </div>
+          <label class="primary"
+            >이미지 업로드<input
+              id="upload"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              hidden
+          /></label>
+        </div>
+      </section>
+      <section class="page hidden" id="profile">
+        <div class="eyebrow">THIS IS ME</div>
+        <h1>내 프로필</h1>
+        <p class="intro">동료들에게 나를 소개해 주세요.</p>
+        <form class="profile-form" id="profile-form">
+          <label>이름<input name="name" maxlength="20" required /></label
+          ><label
+            >캐릭터 이름<input name="petName" maxlength="20" required /></label
+          ><label>팀 / 직무<input name="role" maxlength="40" /></label
+          ><label
+            >오늘의 한마디<textarea
+              name="bio"
+              maxlength="120"
+              rows="3"
+            ></textarea></label
+          ><label class="checkbox"
+            ><input type="checkbox" name="remember" /> 이 기기에서 프로필
+            유지하기</label
+          >
+          <p class="muted">
+            공용 PC에서는 선택을 해제해 주세요. 실제 계정 로그인은 아직 연결되지
+            않았어요.
+          </p>
+          <button class="primary">프로필 저장</button>
+        </form>
+      </section>
+      <section class="page hidden" id="inbox">
+        <div class="eyebrow">CATCH UP AT YOUR PACE</div>
+        <h1>놓친 이야기</h1>
+        <p class="intro">다른 방의 새 소식과 나를 부른 메시지를 모았어요.</p>
+        <div class="inbox-tabs">
+          <button id="inbox-all" class="secondary">모든 새 이야기</button
+          ><button id="inbox-mentions" class="secondary">
+            나를 멘션한 이야기</button
+          ><button id="read-all" class="primary">모두 읽음</button>
+        </div>
+        <div id="inbox-list"></div>
+      </section>
+      <section class="page hidden" id="settings">
+        <div class="eyebrow">OUR PRIVATE LITTLE SPACE</div>
+        <h1>연결과 초대</h1>
+        <p class="intro">각자의 자리에서, 원할 때 만나고 퇴근해요.</p>
+        <div class="setup-grid">
+          <section class="setup-card">
+            <h2>① 웹에서 로그인</h2>
+            <p>
+              로그인은 기본 웹브라우저에서 진행해요. 완료하면 설치된 앱에
+              자동으로 연결돼요.
+            </p>
+            <button class="primary" id="web-login">웹 로그인 열기</button
+            ><button class="secondary" id="logout">로그아웃</button>
+            <p id="login-state"></p>
+          </section>
+          <section class="setup-card">
+            <h2>② 내가 원할 때 접속</h2>
+            <p>
+              내가 접속을 종료해도 다른 동료들의 채팅과 캐릭터는 그대로
+              유지돼요. 다시 접속하면 놓친 이야기를 확인할 수 있어요.
+            </p>
+            <button class="primary" id="session-toggle">
+              접속 종료 · 퇴근하기
+            </button>
+            <p class="muted">
+              웹 로그인 정보는 유지할 수 있어요. 공용 PC에서는 로그아웃을 선택해
+              주세요.
+            </p>
+          </section>
+          <section class="setup-card">
+            <h2>중앙 서비스 연결</h2>
+            <p>
+              우리 팀이 사용하는 클라우드 서비스에 연결해요. 직원 PC에서 서버를
+              실행하지 않아요.
+            </p>
+            <form id="server-form">
+              <label for="server-url">우리 팀 서비스 주소</label
+              ><input
+                id="server-url"
+                type="url"
+                placeholder="https://우리팀서비스.onrender.com"
+                required
+              /><button class="primary">이 주소로 연결</button>
+            </form>
+            <p id="server-current"></p>
+          </section>
+          <section class="setup-card">
+            <h2>우리 공간 초대 코드</h2>
+            <p>
+              관리자가 초대한 직원만 가입할 수 있어요. 코드 변경은 이후 가입에만
+              적용돼요.
+            </p>
+            <code id="invite-code">로그인 후 관리자에게 확인해 주세요.</code>
+            <div class="invite-buttons">
+              <button class="secondary" id="copy-invite">초대 정보 복사</button
+              ><button class="secondary" id="rotate-invite">코드 변경</button>
+            </div>
+            <p class="muted">
+              직접 설치한 앱은 Google OAuth 키 없이 아이디·비밀번호 로그인을
+              사용해요.
+            </p>
+          </section>
+        </div>
+      </section>
+    </main>
+    <dialog id="modal">
+      <button id="modal-close" class="modal-close" aria-label="닫기">×</button>
+      <div id="modal-content"></div>
+    </dialog>
+    <div id="toast" role="status"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
