@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:"
+    />
+    <title>뭉글 바탕화면 친구</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="pet.css" />
+  </head>
+  <body class="desktop-pet">
+    <div id="pet-bubble" class="hidden" aria-live="polite"></div>
+    <button id="pet-handle" aria-label="캐릭터 잡아서 이동">
+      <span id="pet-name"></span><span id="pet-art"></span
+      ><span id="pet-shadow"></span><span id="pet-status"></span>
+    </button>
+    <script src="pet.js"></script>
+  </body>
+</html>

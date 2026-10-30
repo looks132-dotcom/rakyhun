@@ -24,9 +24,12 @@ window.moongle.onSnapshot((data) => {
       n.className = "mini-name";
       n.textContent = p.name + (p.id === data.userId ? " · 나" : "");
       wrap.append(c, n);
-      const m = data.messages
-        .filter((m) => m.userId === p.id && Date.now() - m.createdAt < 7000)
-        .at(-1);
+      const m =
+        p.status !== "offline" &&
+        data.status !== "offline" &&
+        data.messages
+          .filter((m) => m.userId === p.id && Date.now() - m.createdAt < 7000)
+          .at(-1);
       if (m) {
         const b = document.createElement("div");
         b.className = "mini-bubble";
@@ -40,7 +43,7 @@ window.moongle.onSnapshot((data) => {
     ? data.status === "focus"
       ? "집중 중 · 알림을 쉬고 있어요"
       : "캐릭터들과 연결되어 있어요 · 상단을 잡아 이동"
-    : "중앙 서비스와 연결이 끊겼어요. 다시 연결하는 중이에요.";
+    : "기기 로그인 후 같은 사내 모임에 참여해 주세요.";
 });
 $("#mini-form").onsubmit = async (e) => {
   e.preventDefault();

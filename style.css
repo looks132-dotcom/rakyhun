@@ -1,4 +1,25 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap");
+.lan-toggles {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+  font-size: 11px;
+  color: #7a8e69;
+}
+.lan-toggles input {
+  accent-color: #7e9670;
+}
+#lan-create,
+#lan-join,
+#lan-manual {
+  margin-top: 12px;
+}
+#invite-code {
+  font-size: 10px;
+  word-break: break-all;
+  max-height: 110px;
+  overflow: auto;
+}
 .connection-banner {
   margin: 18px 43px 0;
   padding: 12px 16px;

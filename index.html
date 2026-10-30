@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'"
     />
     <title>뭉글 — 함께 일하는 작은 친구들</title>
     <link rel="stylesheet" href="./style.css" />
@@ -45,7 +45,7 @@
         </div>
         <div class="header-right">
           <span class="demo-badge" id="connection-badge">미리보기</span
-          ><button class="secondary" id="mini-open">↗ 미니 모드</button
+          ><button class="secondary" id="mini-open">↗ 바탕화면 친구</button
           ><span class="date" id="date"></span>
         </div>
       </header>
@@ -201,64 +201,90 @@
       </section>
       <section class="page hidden" id="settings">
         <div class="eyebrow">OUR PRIVATE LITTLE SPACE</div>
-        <h1>연결과 초대</h1>
-        <p class="intro">각자의 자리에서, 원할 때 만나고 퇴근해요.</p>
+        <h1>사내 연결과 초대</h1>
+        <p class="intro">
+          서로의 PC를 직접 연결해요. 방장 PC와 클라우드 서버가 필요 없어요.
+        </p>
         <div class="setup-grid">
           <section class="setup-card">
-            <h2>① 웹에서 로그인</h2>
+            <h2>① 이 PC에서 로그인</h2>
             <p>
-              로그인은 기본 웹브라우저에서 진행해요. 완료하면 설치된 앱에
-              자동으로 연결돼요.
+              기본 웹브라우저에서 이 기기의 계정을 만들고 로그인해요. 계정은 이
+              PC에서만 사용해요.
             </p>
-            <button class="primary" id="web-login">웹 로그인 열기</button
+            <button class="primary" id="web-login">기기 로그인 열기</button
             ><button class="secondary" id="logout">로그아웃</button>
             <p id="login-state"></p>
           </section>
           <section class="setup-card">
-            <h2>② 내가 원할 때 접속</h2>
+            <h2>② 우리 모임 만들기 / 참여</h2>
             <p>
-              내가 접속을 종료해도 다른 동료들의 채팅과 캐릭터는 그대로
-              유지돼요. 다시 접속하면 놓친 이야기를 확인할 수 있어요.
+              처음 한 명이 모임 코드를 만들고 공유하세요. 만든 사람이 퇴근해도
+              모임은 계속돼요.
+            </p>
+            <form id="lan-create">
+              <input
+                id="lan-name"
+                maxlength="40"
+                placeholder="예: 디자인팀"
+                aria-label="새 모임 이름"
+                required
+              /><button class="primary">새 모임 만들기</button>
+            </form>
+            <form id="lan-join">
+              <input
+                id="lan-code"
+                maxlength="1024"
+                placeholder="동료에게 받은 MOONGLE1. 코드"
+                aria-label="모임 초대 코드"
+                required
+              /><button class="secondary">이 모임 참여</button>
+            </form>
+          </section>
+          <section class="setup-card">
+            <h2>내 접속과 바탕화면</h2>
+            <p>
+              미접속한 동료도 퇴근 캐릭터로 남아요. 미접속 중에는 말풍선을
+              숨기고 메신저에 기록을 보관해요.
             </p>
             <button class="primary" id="session-toggle">
               접속 종료 · 퇴근하기
             </button>
-            <p class="muted">
-              웹 로그인 정보는 유지할 수 있어요. 공용 PC에서는 로그아웃을 선택해
-              주세요.
-            </p>
-          </section>
-          <section class="setup-card">
-            <h2>중앙 서비스 연결</h2>
-            <p>
-              우리 팀이 사용하는 클라우드 서비스에 연결해요. 직원 PC에서 서버를
-              실행하지 않아요.
-            </p>
-            <form id="server-form">
-              <label for="server-url">우리 팀 서비스 주소</label
-              ><input
-                id="server-url"
-                type="url"
-                placeholder="https://우리팀서비스.onrender.com"
-                required
-              /><button class="primary">이 주소로 연결</button>
-            </form>
-            <p id="server-current"></p>
-          </section>
-          <section class="setup-card">
-            <h2>우리 공간 초대 코드</h2>
-            <p>
-              관리자가 초대한 직원만 가입할 수 있어요. 코드 변경은 이후 가입에만
-              적용돼요.
-            </p>
-            <code id="invite-code">로그인 후 관리자에게 확인해 주세요.</code>
-            <div class="invite-buttons">
-              <button class="secondary" id="copy-invite">초대 정보 복사</button
-              ><button class="secondary" id="rotate-invite">코드 변경</button>
+            <div class="lan-toggles">
+              <label
+                ><input type="checkbox" id="pets-visible" checked /> 바탕화면에
+                캐릭터 표시</label
+              ><label
+                ><input type="checkbox" id="pets-roaming" checked /> 접속한
+                캐릭터가 가끔 걸어 다니기</label
+              >
             </div>
-            <p class="muted">
-              직접 설치한 앱은 Google OAuth 키 없이 아이디·비밀번호 로그인을
-              사용해요.
+            <button class="secondary" id="messenger-settings">
+              별도 메신저 창 열기 ↗
+            </button>
+          </section>
+          <section class="setup-card">
+            <h2>우리 모임 초대 코드</h2>
+            <p>
+              이 코드를 아는 동료끼리 같은 사내 네트워크에서 연결해요. 처음 만난
+              동료는 서로 앱을 켰을 때 목록에 추가돼요.
+            </p>
+            <code id="invite-code">로그인하고 모임에 참여해 주세요.</code>
+            <div class="invite-buttons">
+              <button class="secondary" id="copy-invite">초대 정보 복사</button>
+            </div>
+            <p id="server-current"></p>
+            <div id="lan-addresses"></div>
+            <form id="lan-manual">
+              <input
+                id="lan-peer-address"
+                placeholder="동료 IP:포트 (예: 192.168.0.10:41765)"
+                aria-label="동료 사내 주소"
+                required
+              /><button class="secondary">직접 연결</button>
+            </form>
+            <p class="muted" id="lan-warning">
+              자동 검색이 제한되면 동료의 사내 주소로 직접 연결할 수 있어요.
             </p>
           </section>
         </div>

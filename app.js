@@ -163,7 +163,12 @@ async function saveProfile() {
   renderPets(true);
 }
 function speech(pet, text) {
-  if (!pet) return;
+  if (
+    !pet ||
+    status === "offline" ||
+    people.find((p) => p.id === pet.dataset.id)?.status === "offline"
+  )
+    return;
   pet.querySelector(".speech")?.remove();
   const b = el("div", "speech", text);
   pet.prepend(b);
@@ -451,13 +456,13 @@ function connection() {
         ? "재연결 중"
         : "로그인 필요";
   b.replaceChildren();
-  if (desktop && !info.serverUrl) {
+  if (desktop && authenticated && !info.configured) {
     b.append(
       document.createTextNode(
-        "중앙 서비스 개통 대기 · 배포 후 모든 직원이 같은 서비스에 연결돼요.",
+        "모임을 만들거나 동료의 초대 코드를 입력하면 사내 PC끼리 연결돼요.",
       ),
     );
-    const setup = el("button", "primary", "서비스 연결 설정");
+    const setup = el("button", "primary", "사내 모임 참여");
     setup.onclick = () => view("settings");
     b.append(setup);
   } else if (preview) {
@@ -484,7 +489,7 @@ function connection() {
   } else if (!connected) {
     b.append(
       document.createTextNode(
-        "중앙 서버와 연결이 끊겼어요. 연결되면 자동으로 다시 불러와요.",
+        "내 PC와 연결이 끊겼어요. 연결되면 자동으로 다시 불러와요.",
       ),
     );
   } else {
@@ -604,7 +609,7 @@ async function sendMessage(text, type = "text", toUserId = "") {
   if (status === "offline")
     throw Error("근무 중으로 변경하면 대화할 수 있어요.");
   if (!preview && (!authenticated || !connected))
-    throw Error("먼저 웹 로그인과 서비스 연결을 확인해 주세요.");
+    throw Error("먼저 기기 로그인과 사내 모임 연결을 확인해 주세요.");
   if (!roomId) throw Error("대화방을 먼저 선택해 주세요.");
   const mentions = people
     .filter((p) => text.includes("@" + p.name))
@@ -726,29 +731,30 @@ function renderChoices() {
 }
 function renderSettings() {
   $("#login-state").textContent = preview
-    ? "파일 미리보기 · 실제 로그인은 설치 앱에서"
+    ? "서버 없는 미리보기"
     : authenticated
-      ? profile.name + "님으로 연결되었어요."
-      : "로그인 전입니다.";
-  $("#server-current").textContent = preview
-    ? "설치 앱에서 서비스 주소를 설정할 수 있어요."
-    : desktop && !info.serverUrl
-      ? "중앙 서비스 개통 대기 · 아직 실제 직원과 연결되지 않았어요."
-      : "현재 접속: " + (info.serverUrl || location.origin);
-  if (document.activeElement !== $("#server-url"))
-    $("#server-url").value = info.serverUrl || "";
-  const w = workspaces.find(
-    (w) => w.id === rooms.find((r) => r.id === roomId)?.workspaceId,
-  );
-  $("#invite-code").textContent = preview
-    ? "미리보기 · 실제 초대 코드가 아닙니다"
-    : w?.invite || "관리자에게 초대 코드를 요청해 주세요.";
-  $("#rotate-invite").disabled = preview || !w?.invite;
-  $("#logout").disabled = !authenticated;
-  $("#server-form button").disabled = !desktop;
+      ? profile.name + "님 · 이 PC 로그인 완료"
+      : "이 PC의 계정으로 로그인해 주세요.";
   $("#session-toggle").disabled = !authenticated && !preview;
   $("#session-toggle").textContent =
     status === "offline" ? "오피스에 접속하기" : "접속 종료 · 퇴근하기";
+  $("#invite-code").textContent = preview
+    ? "미리보기 · 실제 초대 코드가 아닙니다"
+    : workspaces[0]?.invite || "로그인하고 모임을 만들거나 참여해 주세요.";
+  $("#server-current").textContent = preview
+    ? "사내 연결은 설치 앱에서 사용할 수 있어요."
+    : info.configured
+      ? "사내 직접 연결 · 기록은 이 PC에 저장돼요."
+      : "로그인 후 모임을 만들거나 초대 코드를 입력해 주세요.";
+  $("#lan-addresses").replaceChildren(
+    ...(info.addresses || []).map((value) => el("code", "address", value)),
+  );
+  $("#lan-warning").textContent =
+    info.warning ||
+    "같은 사내 네트워크에서 자동 검색해요. 검색되지 않으면 동료의 IP:포트로 직접 연결하세요.";
+  $("#logout").disabled = !authenticated;
+  $("#pets-visible").checked = info.desktopPets !== false;
+  $("#pets-roaming").checked = info.roaming !== false;
 }
 function setupUI() {
   const nav = $('[data-view="profile"]');
@@ -847,7 +853,7 @@ function setupUI() {
   };
   $(".profile-form>.muted").textContent = preview
     ? "미리보기 프로필은 이 기기에만 저장돼요."
-    : "실제 프로필은 중앙 서버에 저장되고 동료들에게 표시돼요. 자동 로그인은 웹 로그인 화면에서 선택해 주세요.";
+    : "프로필과 대화 기록은 내 PC에 저장돼요. 자동 로그인은 웹 로그인 화면에서 선택해 주세요.";
   $("#chat-form").onsubmit = safeAction(async (e) => {
     e.preventDefault();
     await sendMessage($("#chat-input").value);
@@ -945,6 +951,13 @@ function setupUI() {
       ]);
     }
   });
+  const messengerButton = el("button", "secondary", "▤ 메신저");
+  messengerButton.id = "messenger-open";
+  messengerButton.onclick = () =>
+    desktop
+      ? desktop.messenger()
+      : toast("설치 앱에서 별도 메신저를 사용할 수 있어요.");
+  $(".header-right").prepend(messengerButton);
   $("#login-open").onclick = () => view("settings");
   $("#web-login").onclick = safeAction(login);
   $("#session-toggle").onclick = () => {
@@ -971,32 +984,61 @@ function setupUI() {
     renderSettings();
     toast("로그아웃했어요.");
   });
-  $("#server-form").onsubmit = safeAction(async (e) => {
+  async function joinLan(create) {
+    if (!desktop) throw Error("설치 앱에서 사내 모임에 참여해 주세요.");
+    await desktop.joinLan({
+      create,
+      name: $("#lan-name").value,
+      code: $("#lan-code").value.trim(),
+    });
+    info = await desktop.info();
+    roomId = "";
+    lastSeq = 0;
+    initialSync = true;
+    await sync();
+    view("office");
+    toast("우리 모임에 연결했어요. 같은 코드를 동료에게 전달해 주세요.");
+  }
+  $("#lan-create").onsubmit = safeAction(async (e) => {
     e.preventDefault();
-    if (!desktop) throw Error("설치 앱에서 설정해 주세요.");
-    await desktop.setServer($("#server-url").value);
-    await resetConnection();
-    toast("서비스 주소를 연결했어요. 웹 로그인을 열어 주세요.");
+    await joinLan(true);
+  });
+  $("#lan-join").onsubmit = safeAction(async (e) => {
+    e.preventDefault();
+    await joinLan(false);
+  });
+  $("#lan-manual").onsubmit = safeAction(async (e) => {
+    e.preventDefault();
+    if (!desktop) throw Error("설치 앱에서 연결해 주세요.");
+    await desktop.connectPeer($("#lan-peer-address").value);
+    info = await desktop.info();
+    await sync();
+    toast("동료 PC에 연결했어요.");
   });
   $("#copy-invite").onclick = safeAction(async () => {
-    const w = workspaces.find((w) => w.invite);
-    if (preview || !w)
-      throw Error("실제 초대 코드는 로그인한 관리자에게 확인해 주세요.");
-    const address = info.serverUrl || location.origin;
-    const text = `뭉글 오피스 초대\n접속 주소: ${address || location.origin}\n초대 코드: ${w.invite}\n앱의 연결과 초대에서 주소를 입력한 뒤 웹 로그인으로 가입해 주세요.`;
+    const code = workspaces[0]?.invite;
+    if (preview || !code) throw Error("로그인 후 모임을 먼저 만들어 주세요.");
+    const invitation =
+      "뭉글 사내 모임 초대\n" +
+      code +
+      "\n같은 사내 네트워크에서 앱의 사내 연결과 초대에 코드를 입력하세요.";
     try {
-      await navigator.clipboard.writeText(text);
-      toast("초대 정보를 복사했어요.");
+      await navigator.clipboard.writeText(invitation);
+      toast("모임 초대 코드를 복사했어요.");
     } catch {
-      modal("초대 정보", [el("pre", "invite-text", text)]);
+      modal("초대 정보", [el("pre", "invite-text", invitation)]);
     }
   });
-  $("#rotate-invite").onclick = safeAction(async () => {
-    const w = workspaces.find((w) => w.invite);
-    if (!w) return;
-    await api("/api/workspaces/invite", { workspaceId: w.id });
-    await sync();
-    toast("새 초대 코드를 만들었어요.");
+  $("#pets-visible").onchange = safeAction(async (e) => {
+    if (desktop) await desktop.petOptions({ visible: e.target.checked });
+    info = (await desktop?.info()) || {};
+  });
+  $("#pets-roaming").onchange = safeAction(async (e) => {
+    if (desktop) await desktop.petOptions({ roaming: e.target.checked });
+  });
+  $("#messenger-settings").onclick = safeAction(async () => {
+    if (desktop) await desktop.messenger();
+    else toast("설치 앱에서 별도 메신저 창을 열 수 있어요.");
   });
   $("#inbox-all").onclick = () => {
     mentionsOnly = false;
@@ -1166,6 +1208,14 @@ async function init() {
     renderMessages();
     renderInbox();
   } else if (desktop) {
+    desktop.onLanState(async (data) => {
+      info = await desktop.info();
+      if (authenticated) {
+        status = data.status;
+        await sync();
+      }
+      renderSettings();
+    });
     desktop.onAuthenticated(async () => {
       loginPending = false;
       await resetConnection();

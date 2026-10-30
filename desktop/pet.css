@@ -1,0 +1,119 @@
+html,
+body.desktop-pet {
+  width: 170px;
+  height: 240px;
+  margin: 0;
+  background: transparent !important;
+  overflow: hidden;
+  display: block;
+  user-select: none;
+}
+.desktop-pet #pet-handle {
+  position: absolute;
+  left: 15px;
+  bottom: 0;
+  width: 140px;
+  height: 146px;
+  padding: 0;
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  outline: 0;
+}
+.desktop-pet #pet-name {
+  display: block;
+  font-size: 10px;
+  line-height: 19px;
+  padding: 1px 10px;
+  background: #d27ca5;
+  color: white;
+  border: 1px solid #fff9;
+  border-radius: 20px;
+  max-width: 138px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  box-shadow: 0 2px 4px #0002;
+  margin-bottom: 32px;
+}
+.desktop-pet #pet-name:before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #59d68c;
+  border: 1px solid white;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.desktop-pet #pet-art {
+  display: block;
+}
+.desktop-pet .custom-creature {
+  height: 65px;
+  width: 75px;
+  object-fit: contain;
+}
+.desktop-pet #pet-shadow {
+  background: #34412323;
+  width: 50px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+.desktop-pet #pet-status {
+  font-size: 9px;
+  color: #55604a;
+  text-shadow: 0 1px 2px white;
+  background: #ffffffe0;
+  border-radius: 6px;
+  padding: 1px 5px;
+  line-height: 15px;
+}
+.desktop-pet #pet-bubble {
+  position: absolute;
+  bottom: 160px;
+  left: 5px;
+  width: 160px;
+  max-height: 72px;
+  overflow: hidden;
+  background: #fffffff5;
+  border: 1px solid #e1e4d7;
+  box-shadow: 0 2px 6px #0001;
+  border-radius: 13px;
+  padding: 9px 11px;
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.desktop-pet.offline #pet-art {
+  filter: grayscale(0.8);
+  opacity: 0.65;
+}
+.desktop-pet.offline #pet-name {
+  background: #9a9b96;
+}
+.desktop-pet.offline #pet-name:before {
+  background: #c1c2be;
+}
+.desktop-pet.offline .creature,
+.desktop-pet.offline .eyes i,
+.desktop-pet.offline .custom-creature {
+  animation: none !important;
+}
+.desktop-pet.offline .eyes i {
+  height: 2px;
+  margin-top: 3px;
+}
+.desktop-pet.grabbed #pet-handle {
+  cursor: grabbing;
+}
+.desktop-pet.grabbed .creature {
+  animation: wiggle 0.18s infinite alternate;
+}
+.desktop-pet.wave .creature {
+  animation: jump 0.4s ease 2;
+}

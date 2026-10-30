@@ -1,12 +1,12 @@
 {
   "name": "moongle-office",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Private character chat for small teams",
   "author": "Moongle",
   "private": true,
   "main": "desktop/main.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "electron .",
     "desktop": "electron .",
     "dist": "electron-builder --win nsis --x64",
     "test": "node --test test/*.test.js",
@@ -32,7 +32,6 @@
       "app.js",
       "login.html",
       "login.js",
-      "server.js",
       "package.json"
     ],
     "win": {

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:"
+    />
+    <title>뭉글 메신저</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="messenger.css" />
+  </head>
+  <body class="messenger-body">
+    <header class="messenger-header">
+      <div>
+        <strong>✳ 뭉글 메신저</strong
+        ><small id="connection">사내 직접 연결</small>
+      </div>
+      <button id="open-office" class="secondary">프로필 · 설정 ↗</button>
+    </header>
+    <div class="messenger-layout">
+      <aside class="messenger-sidebar">
+        <h2>대화방</h2>
+        <div id="room-list"></div>
+        <h2>동료 <span id="peer-count"></span></h2>
+        <div id="contact-list"></div>
+      </aside>
+      <main class="messenger-main">
+        <div class="messenger-room">
+          <strong id="room-title">전체 대화</strong
+          ><span>기록은 이 PC에 보관돼요</span>
+        </div>
+        <div id="history" aria-live="polite"></div>
+        <form id="messenger-form">
+          <input
+            id="message-input"
+            maxlength="300"
+            placeholder="대화를 입력해 주세요. @이름으로 동료 부르기"
+            aria-label="메신저 메시지"
+          /><button class="primary">보내기</button>
+        </form>
+        <div id="send-status" role="status">
+          미접속 동료에게는 전달 대기로 보관하고, 함께 접속했을 때 전달해요.
+        </div>
+      </main>
+    </div>
+    <script src="messenger.js"></script>
+  </body>
+</html>

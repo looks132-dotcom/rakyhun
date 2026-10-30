@@ -1,0 +1,178 @@
+.messenger-body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+.messenger-header {
+  margin: 0;
+  padding: 20px 24px;
+  height: 83px;
+  flex-shrink: 0;
+}
+.messenger-header strong {
+  font-size: 18px;
+  color: #617e51;
+}
+.messenger-header small {
+  display: block;
+  font-size: 10px;
+  color: #98a88b;
+  margin-top: 5px;
+}
+.messenger-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+.messenger-sidebar {
+  width: 170px;
+  flex-shrink: 0;
+  background: #f0f3e8;
+  border-right: 1px solid #e0e6d6;
+  padding: 18px 12px;
+  overflow: auto;
+}
+.messenger-sidebar h2 {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #9ba78e;
+  margin: 10px 8px 15px;
+}
+.messenger-sidebar h2:not(:first-child) {
+  margin-top: 28px;
+}
+.messenger-sidebar button {
+  font-size: 12px;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 9px;
+  border-radius: 7px;
+  overflow-wrap: anywhere;
+}
+.messenger-sidebar button.active {
+  background: white;
+  color: #658153;
+  font-weight: 700;
+}
+.contact {
+  padding: 8px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #6a7a5c;
+}
+.contact small {
+  display: block;
+  font-size: 9px;
+  color: #a4ad99;
+}
+.contact.offline {
+  opacity: 0.65;
+}
+.messenger-main {
+  margin: 0;
+  max-width: none;
+  width: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.messenger-room {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 19px 23px;
+  border-bottom: 1px solid #e6eadd;
+  gap: 10px;
+}
+.messenger-room strong {
+  font-size: 13px;
+}
+.messenger-room span {
+  font-size: 9px;
+  color: #9ca88f;
+}
+#history {
+  flex: 1;
+  overflow: auto;
+  padding: 18px 22px;
+  min-height: 0;
+}
+.history-message {
+  margin: 0 0 20px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.history-message strong {
+  font-size: 10px;
+  color: #8ca279;
+}
+.history-message time {
+  font-size: 9px;
+  color: #b0b8a6;
+  margin-left: 8px;
+}
+.history-message p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  display: table;
+  background: white;
+  border: 1px solid #e4e9da;
+  border-radius: 0 12px 12px;
+  padding: 9px 13px;
+  margin: 5px 0;
+  max-width: 95%;
+}
+.history-message.mine {
+  text-align: right;
+}
+.history-message.mine p {
+  margin-left: auto;
+  background: #e9f0df;
+  border-color: #dce7ce;
+  border-radius: 12px 0 12px 12px;
+}
+.history-message small {
+  font-size: 9px;
+  color: #b49a75;
+}
+.history-message.mentioned p {
+  border-color: #b7cc97;
+}
+#messenger-form {
+  display: flex;
+  gap: 9px;
+  padding: 13px 18px 5px;
+  border-top: 1px solid #e4e9dc;
+}
+#message-input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  border: 1px solid #dfe7d4;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fff;
+  font-size: 11px;
+  outline: 0;
+}
+#message-input:focus {
+  border-color: #91ab79;
+}
+#send-status {
+  font-size: 9px;
+  color: #9ba98c;
+  padding: 6px 18px 15px;
+  line-height: 1.8;
+}
+.history-empty {
+  text-align: center;
+  font-size: 12px;
+  color: #abb49e;
+  padding-top: 90px;
+}

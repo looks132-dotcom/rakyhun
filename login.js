@@ -28,9 +28,12 @@ function setMode(value) {
   q("[name=password]").autocomplete =
     mode === "register" ? "new-password" : "current-password";
   q("#auth-error").textContent = "";
-  q("#signup-help").textContent = config.firstUser
-    ? "최초 관리자 계정은 서비스의 초기 설정 코드가 필요해요. 이후 직원은 초대 코드로 가입해요."
-    : "초대받은 직원만 함께할 수 있어요.";
+  q("#signup-help").textContent =
+    config.mode === "local"
+      ? "이 계정은 이 PC에서만 사용해요. 로그인 후 모임 초대 코드로 사내 동료와 연결하세요."
+      : config.firstUser
+        ? "최초 관리자 계정은 서비스의 초기 설정 코드가 필요해요. 이후 직원은 초대 코드로 가입해요."
+        : "초대받은 직원만 함께할 수 있어요.";
 }
 function success() {
   q("#auth-form").classList.add("hidden");
